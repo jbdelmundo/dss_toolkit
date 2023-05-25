@@ -1,0 +1,28 @@
+
+# Script to adjust jupyter notebook cell width
+# Change % to desired value
+from IPython.core.display import display, HTML
+display(HTML("<style>.container {width: 80% !important; }</style>"))
+# -------------------------------------------------
+# Display full code outputs in cell
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all"
+# -------------------------------------------------
+# Add extra tab in notebook for managing all installed extensions
+!pip install jupyter_nbextensions_configurator
+!jupyter nbextensions_configurator enable --user
+# -------------------------------------------------
+# Install Jupyter Notebook Extensions: Collapse Markdown Cells (# - ######)
+!pip install jupyter_contrib_nbextensions
+!jupyter contrib nbextension install --user
+!jupyter nbextension enable codefolding/main           # Enable codefolding
+#!jupyter nbextension disable codefolding/main          # Disable codefolding
+!jupyter nbextension enable collapsible_headings/main  # Enable codefolding
+#!jupyter nbextension disable collapsible_headings/main # Disable codefolding
+!jupyter nbextension enable execute_time/ExecuteTime
+!jupyter nbextension enable toggle_all_line_numbers/main  # Enable codefolding
+#!jupyter nbextension disable toggle_all_line_numbers/main # Disable codefolding
+!jupyter nbextension enable toc2/main  # Enable codefolding
+#!jupyter nbextension disable toc2/main # Disable codefolding
+!jupyter nbextension enable ruler/main  # Enable codefolding
+#!jupyter nbextension disable ruler/main # Disable codefolding

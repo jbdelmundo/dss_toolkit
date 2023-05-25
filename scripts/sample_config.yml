@@ -1,0 +1,12 @@
+default:
+  project:
+    name : project-name-here
+    developer : "Name Here"
+    core_id : coreid-here
+    environment : development
+
+  environments:
+    development:
+      spark_home: "/opt/cloudera/parcels/CDH-6.3.4-1.cdh6.3.4.p0.6751098/lib/spark"
+    production:
+      spark_home: "/opt/cloudera/parcels/CDH-6.2.1-1.cdh6.2.1.p4101.4834794/lib/spark"

@@ -1,0 +1,282 @@
+
+# Toolkit Functionality
+
+- Model Pipeline/Classes
+    - Classification
+        - Binary
+        - MultiClass
+    - Clustering
+    - Regression
+
+
+    Classifier methods
+    - fit(X,y=None)
+    - predict(x,y)
+    - predict_proba(X)
+    - score(X,y)
+        estimator.score()
+    - get/set cv_results
+
+    ModelClassifier
+
+    - data_prepare(df, fields)
+    - log_transform(df, fields)
+    - get_filtered_low_variance_features(df)
+    - set/get decomposer(pca_params)
+    - set/get scaler (scaler_type[standard, quantile etc])
+    - set get grid_search (search_type)
+
+    - pipeline_generator(scaler, pca)
+        returns sklearn.pipeline.Pipeline
+    
+    - classifier() # Fit Classifier
+        get_grid_search()
+        gridsearch.fit()
+    - classifier_metrics()
+        - internal call to predict()
+        - evaluation_scores(label, pred)
+        - confusion_matrix
+        - data sets: (dependent on data splitting)
+            - train_dev
+            - test
+            - validation
+            - cross validation??
+    - decile_analysis
+
+    ModelSegmentation
+
+    - set/get cluster assignments
+        - model.predict
+    - cluster_metrics
+        Silhoutte Scores
+    - customer_assignments()
+        mastercif + clusterid mapping
+    - individual_clusters_scores
+
+
+================ Pipeline Assumptions ============
+{
+    "preprocessing":[
+        "cleaning":
+        "feature selection"
+
+    ]
+    "algorithm":
+    "hyperparameter_tuning"
+    "metrics":
+}
+
+
+============== MODULES ============
+- Data Query
+    - Database Exploration
+    - Data Download
+    - Data Upload
+
+
+- Data preprocessing
+    - EDA
+        - eda_numeric_cols()
+        - eda_categorical_cols()
+    
+    - Cleaning 
+        - replace_invalid_values() (Numeric and Categorical)
+        - remove_whitespace()
+        - replace_iqr_outlier()
+        - replace_low_cardinality()
+    - Feature Selection
+        - appy_boruta()
+        - get_low_variance_columns()
+        - find_column_correlations()
+        - find_VIF()
+
+    - Feature Engineering
+        - New Features
+        - Transformation 
+    - Oversampling and Undersampling
+        - smote
+
+- Modeling
+    - Algorithm
+        - Classification algorithms
+        - Clustering algorithms
+        - Regression algorithms
+    - Hyperparameter Optimization
+        - Grid Search
+
+- Visualizations
+
+- Metrics
+    - Machine Learning
+        - Classification Metric
+            - Binary
+            - MultiClass
+        - Clustering Metrics
+        - Regression Metrics
+    - LeadsGen Metrics
+        - KS Decile
+
+- Deployment
+
+
+- helpers
+    - local storage
+    - cloud storage
+    - pandas
+
+
+
+##  Module Structure
+
+- Common-Lib
+    | common
+        | bingbong scripts
+    | data_build
+        | spark_utils.py
+        | data_qa.py
+    | data_analysis
+        | eda.py
+    | modeling
+        | preprocessing
+            | smote.py
+            | scaling.py
+        | modeling_base.py
+        | model_metrics.py
+    | documentation
+        | data_dictionary
+ 
+
+
+DSS Toolkit
+    | preprocessing
+        Cleaning (values, missing, data types)
+        feature_selection (boruta, vif,low variance)
+        transform
+        
+    | visualization
+    | helpers
+        pandas
+        storage
+        hdfs
+        spark
+    | modeling
+        algorithms
+        metrics
+    | Deployment
+        structure (setup inital folder structure)
+        
+
+
+
+
+
+## Project Structure
+
+- /data
+    input
+    -<yyyymm>
+    output
+        <yyyymm>
+- /model
+- /docs
+- /scripts
+    /data_build
+    /model_development(Experiments)
+    /production
+- /config
+    - data_sources.yaml
+    - spark.yaml
+    - project.yaml
+- deploy-build.sh
+
+
+
+- Data Build
+    | Common.ipynb
+    | Training.ipynb
+    | Inference.ipynb
+- Model Training
+    | Model Development.ipynb
+    | Model Performance
+- Inference
+    | Inference.ipynb
+- Deployment
+    | <python scripts>
+        - data_build.py
+        - model_train.py
+        - inference.py
+        - upload.py
+- Adhoc Analysis
+
+
+# =========== Target Usage ===========
+Check sample  Project
+Git Clone + Pip install
+Specify Data Sources and SQL Query -> Produces parquet files
+Notebooks: Data Build -> Produces build files (Train and Inference)
+Notebooks: Modeling -> Model file, Model Metrics
+Notebooks: Inference -> Leads/Scores etc
+Deployment Scripts 
+
+# =========== TODO Issues ===========
+- Resolve dependency conflict nb_black vs tensorflow on typing-extensions versioning 
+- Latest scikit-learn 1.0 version needs Python 3.8? (not readily available)
+- Sample Notebooks for Usage
+- New Features
+    - Visualizations
+        - Multiple axes
+        - Sankey
+- Contribution Guide
+
+# =========== Project Workflow ===========
+- Model Devt Plan
+- Data Build Iterations
+    - Download of Data
+    - Data Cleaning
+    - Data Analysis (EDA)
+- Model Iterations
+    - Algorithm Selection (Classification, Regression, Clustering)
+    - Hyperparameter Tuning
+    - Model Performance
+- Presentation
+    - Technical Presentation
+    - Business Presentation
+- Deployment
+    - Script Automation/Refactoring From Notebooks
+        - Data Build
+        - Training
+        - Scoring
+        - Upload
+    - AB/Testing
+    - UAT
+    - Git Integration
+- Project Documents
+    - Model Developent Plan
+    - Data Dictionary
+    - Presentation Decks
+        - Technical
+        - Business
+    - Performance Metrics
+    - Cost Benefit
+
+
+=======================================================
+Setting up Sphinx-docs
+9https://betterprogramming.pub/auto-documenting-a-python-project-using-sphinx-8878f9ddc6e9)
+
+- install sphinx via Pip
+- create 'docs' directory
+- use `sphinx-quickstart` (use same source and build)
+- Update `conf.py`
+    - `html_theme` : sphinx_rtd_theme (read the docs theme)
+    - Specify location of module
+        `sys.path.insert(0, os.path.abspath('../dss_tooklit'))`
+    - extensions
+        'sphinx.ext.autodoc' (for generation of .rst files)
+        'sphinx.ext.napoleon' (for support for numpy docstring style)
+- `sphinx-autodoc -o <OUTPUT_PATH> <MODULE_PATH>`
+    OUTPUT_PATH: output location of rst files
+    MODULE_PATH: location of python files
+- `sphinx-build -b html <INPUT PATH> <OUTPUT PATH>
+    INPUT PATH: location of `conf.py`
+    OUTPUT PATH: location of html docs
