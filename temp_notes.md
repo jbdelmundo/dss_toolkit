@@ -105,3 +105,68 @@ Maximize cell width in jupyter notebook
 # Script to adjust jupyter notebook cell width
 from IPython.core.display import display, HTML
 display(HTML("<style>.container {width: 100% !important; }</style>"))
+
+
+
+{
+    "shortcuts": [
+        {
+            "command": "runmenu:restart-and-run-all",
+            "keys": [
+                "F6"
+            ],
+            "selector": "[data-jp-code-runner]"
+        },
+        {
+            "command": "notebook:restart-clear-output",
+            "keys": [
+                "Ctrl Shift 9"
+            ],
+            "selector": "[data-jp-kernel-user]:focus"
+        },
+        {
+            "command": "notebook:run-all-above",
+            "keys": [
+                "Ctrl Shift 8"
+            ],
+            "selector": "[data-jp-kernel-user]:focus"
+        }
+    ]
+}
+
+
+
+DQ Analyzer (No change of data)
+Input: Set of columns
+Output: Analysis of columns, applies analyzer
+
+- Boolean Analyzer
+    Distribution of true,false, null
+
+- Completeness Analyzer ()
+    - Not null check
+    Input: Values considered null (None, Null, "")
+    Output: Null percentage per column
+
+
+- String Character Analyzer
+    - inspects for latin, hebrew, cyrillic etc
+
+- Date/Time Analyzer
+	
+- NumberAnalyzer
+    - Range (min, max)
+    - distribution
+    - variance
+
+- CategoricalAnalyzer
+    - unique values
+    - variance
+
+
+
+DATA CLEANER (fixes data)
+NumericImputation
+CategoricalImputation
+OneHotEncode
+OutlierCapping (featureengine.windsorizer)

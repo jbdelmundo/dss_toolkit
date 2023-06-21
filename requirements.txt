@@ -1,18 +1,23 @@
 
 # Python 3.8
-numpy>=1.22
-pandas>=1.5
-scikit-learn>=1.2 #Version 1.0.0 of scikit-learn requires python 3.7+
-sklearn_pandas>=2.2
-pyspark==2.4.0
-matplotlib>=3.1
-seaborn>=0.9
-imblearn # Might have some conflict with scikit-learn version
+flake8
+numpy
+pandas
+scikit-learn
+sklearn_pandas
+# pyspark==2.4.0
+matplotlib
+seaborn
+imblearn
 pyyaml==6.0
 # pyreadr==0.4.4 # pyreadr 0.4.4 depends on pandas>=1.2.0  
 #skimpy # requires python >=3.7.1,<4.0.0
-pyarrow==6.0.1
-xgboost==1.5.2
+pyarrow
+xgboost
 Boruta
-statsmodels>=0.13
-openpyxl>=3.0
+statsmodels
+openpyxl
+optuna
+Jinja2
+feature-engine
+klib

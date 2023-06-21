@@ -7,8 +7,13 @@ import pandas as pd
 from IPython.display import display
 
 
-def show(df, n_decimals=None):
+def show(df, n_decimals=4, thousands_sep=True):
     "Fully display a Pandas DataFrame."
+    if thousands_sep:
+        thousands_sep = ","
+    else:
+        thousands_sep = ""
+
     if n_decimals is not None:
         with pd.option_context(
             "display.max_rows",
@@ -16,9 +21,9 @@ def show(df, n_decimals=None):
             "display.max_columns",
             None,
             "display.max_colwidth",
-            -1,
+            None,
             "display.float_format",
-            f"{{:0.{n_decimals}f}}".format
+            f"{{:{thousands_sep}.{n_decimals}f}}".format,
         ):
             display(df)
 
@@ -29,7 +34,7 @@ def show(df, n_decimals=None):
             "display.max_columns",
             None,
             "display.max_colwidth",
-            -1,
+            None,
         ):
             display(df)
 
@@ -59,8 +64,5 @@ def deduplicate_names(names, sep="_"):
         dupe_mask = names == name
         n_duplicates = len(names_deduped[dupe_mask])
         n_digits = int(np.log10(n_duplicates - 1)) + 1
-        names_deduped[dupe_mask] = [
-            f"{name}{sep}{i:0{n_digits}}" for i in range(n_duplicates)
-        ]
+        names_deduped[dupe_mask] = [f"{name}{sep}{i:0{n_digits}}" for i in range(n_duplicates)]
     return names_deduped
-
