@@ -96,7 +96,7 @@ def clean_invalid_values(
     # Indentify invalid rows
     # For categorical column
     if len(possible_values) > 0 and type(possible_values) == list:
-        invalid_rows = df[~df[column].isna() & ~df[column].isin(possible_values)]
+        invalid_rows = df[df[column].isna() | df[column].isin(possible_values)]
         invalid_rows_all = pd.concat([invalid_rows_all, invalid_rows], axis=0)
 
     # For numeric column

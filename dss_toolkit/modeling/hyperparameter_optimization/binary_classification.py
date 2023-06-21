@@ -109,6 +109,8 @@ def run_hyperparameter_optmization(
     y,
     validation_data=None,
     metric="accuracy",
+    score_on_proba=False,
+    metric_args=dict(),
     n_trials=10,
     direction="maximize",
 ):
@@ -123,6 +125,8 @@ def run_hyperparameter_optmization(
         y=y,
         validation_data=validation_data,
         metric=metric,
+        score_on_proba=score_on_proba,
+        metric_args=metric_args,
     )
 
     # Run objective function multiple times to search for the best trial

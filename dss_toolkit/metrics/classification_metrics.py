@@ -24,6 +24,7 @@ def generate_classification_report(y_true, y_proba, threshold=0.5):
 
     roc_auc = roc_auc_score(y_true, y_proba)
     report = {
+        "Total Obs": y_true.shape[0],
         "Majority Obs ({})".format(valcounts.index[0]): valcounts[0],
         "Minority Obs ({})".format(valcounts.index[1]): valcounts[1],
         "Classification Threshold": threshold,

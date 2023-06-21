@@ -94,7 +94,7 @@ class OptimizeNumbers(TransformerMixin, BaseEstimator):
         pass
         self.columns_ = None
 
-    def fit(self, X):
+    def fit(self, X, y=None):
         self.columns_ = X.columns
         return self
 

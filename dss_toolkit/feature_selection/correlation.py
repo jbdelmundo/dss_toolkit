@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from sklearn.base import BaseEstimator, TransformerMixin
+
 
 def find_column_correlations(df):
     corr_matrix = df.corr()
@@ -16,3 +18,79 @@ def find_column_correlations(df):
     corr_pairs = corr_pairs[["index", "index2", "corr"]]
     corr_pairs["abs_corr"] = corr_pairs["corr"].abs()
     return corr_pairs.sort_values("abs_corr", ascending=False)
+
+
+class CorrelationFilter(BaseEstimator, TransformerMixin):
+    def __init__(self, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
+        self.threshold = threshold
+        self.use_abs_corr = use_abs_corr
+        self.maximize_dropped = maximize_dropped
+        self.dropped_columns_ = None
+
+    def fit(self, X, y=None):
+        self.dropped_columns_ = find_correlated_columns_to_drop(
+            X, threshold=self.threshold, use_abs_corr=self.use_abs_corr, maximize_dropped=self.maximize_dropped
+        )
+        # Remaining columns
+        self.columns_ = [c for c in X.columns if c not in self.dropped_columns_]
+        return self
+
+    def transform(self, X, y=None):
+        return X[self.columns_].copy()
+
+    def get_feature_names_out(self, *args, **params):
+        return self.columns_
+
+
+def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
+    """
+    Returns list of columns to drop based on correlation
+    Parameters
+    --------
+    df: DataFrame
+    threshold: float
+        minimum threshold to be considered correlated pairs
+    use_abs_corr: bool
+        Whether to consider negative correlation
+    maximize_dropped: bool
+        if true, Drop first with the most correlated features.
+        Suppose correlated pairs are (A,B), (A,C), (A,D), if set to True, this will drop B,C,D, if false, will drop A
+    """
+
+    # Compute corrleation matrix
+    corr_matrix = df[df.select_dtypes("number").columns].corr()
+    np.fill_diagonal(corr_matrix.values, np.nan)
+
+    # Split into correlation pairs (feat_1, feat_2, correlation, abs_correlation)
+    corr_pairs = corr_matrix.reset_index().melt(id_vars="index")
+    corr_pairs.columns = ["feat_1", "feat_2", "correlation"]
+    corr_pairs["abs_correlation"] = corr_pairs["correlation"].abs()
+    corr_pairs.dropna(subset=["correlation"], inplace=True)
+
+    # Drop features iteratively based on the related features
+    dropped_features = []
+    if use_abs_corr:
+        drop_pairs = corr_pairs[corr_pairs.abs_correlation > threshold].copy()
+    else:
+        drop_pairs = corr_pairs[corr_pairs.correlation > threshold].copy()
+
+    while drop_pairs.shape[0] > 0:
+        feature_ranking = (
+            drop_pairs.groupby("feat_1")
+            .agg(
+                related_feat_count=("feat_2", "count"),
+                related_features=("feat_2", list),
+            )
+            .reset_index()
+            .sort_values("related_feat_count", ascending=maximize_dropped)  # Sort based on number of related features
+        ).reset_index(drop=True)
+        #     display(feature_ranking)
+        # Check for remaining features to drop
+        if feature_ranking.shape[0] > 0:
+            to_drop = feature_ranking["feat_1"][0]
+            #         print("dropping", to_drop)
+            dropped_features.append(to_drop)
+
+            dropped_ix = drop_pairs[(drop_pairs.feat_1 == to_drop) | (drop_pairs.feat_2 == to_drop)].index
+            drop_pairs.drop(dropped_ix, inplace=True)
+    return dropped_features
