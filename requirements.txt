@@ -20,4 +20,4 @@ openpyxl
 optuna
 Jinja2
 feature-engine
-klib
+lightgbm

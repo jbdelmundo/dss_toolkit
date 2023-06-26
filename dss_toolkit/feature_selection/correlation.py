@@ -1,7 +1,9 @@
 import numpy as np
+from numpy import ndarray
 import pandas as pd
 
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
+from sklearn.feature_selection import SelectorMixin
 
 
 def find_column_correlations(df):
@@ -20,14 +22,16 @@ def find_column_correlations(df):
     return corr_pairs.sort_values("abs_corr", ascending=False)
 
 
-class CorrelationFilter(BaseEstimator, TransformerMixin):
+class CorrelationFilter(BaseEstimator, SelectorMixin):
     def __init__(self, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
         self.threshold = threshold
         self.use_abs_corr = use_abs_corr
         self.maximize_dropped = maximize_dropped
         self.dropped_columns_ = None
+        self.orig_columns_ = None
 
     def fit(self, X, y=None):
+        self.orig_columns_ = X.columns
         self.dropped_columns_ = find_correlated_columns_to_drop(
             X, threshold=self.threshold, use_abs_corr=self.use_abs_corr, maximize_dropped=self.maximize_dropped
         )
@@ -40,6 +44,14 @@ class CorrelationFilter(BaseEstimator, TransformerMixin):
 
     def get_feature_names_out(self, *args, **params):
         return self.columns_
+
+    def get_support(self, indices: bool = False) -> ndarray:
+        if indices:
+            indices_ix = [ix for ix, c in enumerate(self.orig_columns_) if c not in self.dropped_columns_]
+            return np.array(indices_ix)
+        else:
+            mask_values = [c not in self.dropped_columns_ for c in self.orig_columns_]
+            return np.array(mask_values)
 
 
 def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
