@@ -14,12 +14,12 @@ class InvalidValuesCleaner(BaseEstimator, TransformerMixin):
         """
         # TODO add validation for rules
         self.rules = rules
-        for rule in rules:
-            self.__validate_invalidvaluescleaner_rule(rule)
+        for rule_ix, rule in enumerate(rules):
+            self.__validate_invalidvaluescleaner_rule(rule, rule_ix)
         self.columns_ = None
 
     def add_rule(self, rule):
-        self.__validate_invalidvaluescleaner_rule(rule)
+        self.__validate_invalidvaluescleaner_rule(rule, rule_ix=0)
         self.rules.append(rule)
 
     def fit(self, X, y=None):
@@ -28,29 +28,29 @@ class InvalidValuesCleaner(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         self.columns_ = X.columns
-        df = X.copy()  # Creat a copy to modify
+        df = X.copy()  # Create a copy to modify
         for column, kwargs, replacement in self.rules:
             clean_invalid_values(df, column=column, inplace=True, replacement=replacement, **kwargs)
         return df
 
-    def __validate_invalidvaluescleaner_rule(self, rule):
+    def __validate_invalidvaluescleaner_rule(self, rule, rule_ix=None):
         if len(rule) != 3:
-            msg = "Rule should be a tuple of length 3: (column, args, replacement)"
+            msg = f"Rule at index {rule_ix} should be a tuple of length 3: (column, args, replacement)"
             raise ValueError(msg)
 
         column, args, replacement = rule
 
         if len(args.keys()) == 0:
-            msg = 'Atleast 1 argument required: ["min_value", "max_value","possible_values"]"'
+            msg = 'Atleast 1 argument required: ["min_value", "max_value","valid_values"]"'
             raise ValueError(msg)
 
         # Validate arguments
         for arg in list(args.keys()):
-            if arg not in ["min_value", "max_value", "possible_values"]:
-                msg = f'Argument {arg} not in ["min_value", "max_value","possible_values"]"'
+            if arg not in ["min_value", "max_value", "valid_values"]:
+                msg = f'Argument {arg} not in ["min_value", "max_value","valid_values"]"'
                 raise ValueError(msg)
 
-            if arg == "possible_values" and type(args["possible_values"]) != list:
+            if arg == "valid_values" and type(args["valid_values"]) != list:
                 msg = "Argument `possible_values` should be a list"
                 raise ValueError(msg)
 
@@ -63,7 +63,7 @@ class InvalidValuesCleaner(BaseEstimator, TransformerMixin):
 
 
 def clean_invalid_values(
-    df, column, mode="replace", possible_values=[], min_value=None, max_value=None, replacement=None, inplace=False
+    df, column, mode="replace", valid_values=[], min_value=None, max_value=None, replacement=None, inplace=False
 ):
     """
     Validate values
@@ -92,11 +92,14 @@ def clean_invalid_values(
     Dataframe
     """
     invalid_rows_all = pd.DataFrame()
+    if column not in df.columns:
+        msg = f"Column `{column}` from the rules given is not found in the dataframe"
+        raise ValueError(msg)
 
     # Indentify invalid rows
     # For categorical column
-    if len(possible_values) > 0 and type(possible_values) == list:
-        invalid_rows = df[df[column].isna() | df[column].isin(possible_values)]
+    if len(valid_values) > 0 and type(valid_values) == list:
+        invalid_rows = df[~df[column].isna() & ~df[column].isin(valid_values)]
         invalid_rows_all = pd.concat([invalid_rows_all, invalid_rows], axis=0)
 
     # For numeric column
@@ -160,11 +163,11 @@ class HighCardinlityBinning(TransformerMixin, BaseEstimator):
         self.exclude = exclude
         self.columns_ = None
 
-    def fit(self, X):
+    def fit(self, X, y=None):
         self.columns_ = X.columns
         return self
 
-    def transform(self, X):
+    def transform(self, X, y=None):
         self.columns_ = X.columns
         data_cleaned = replace_low_cardinality(
             X, max_freq=self.max_freq, top_n=self.top_n, other_value=self.other_value, exclude=self.exclude

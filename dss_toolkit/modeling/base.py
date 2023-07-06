@@ -77,6 +77,16 @@ class BinaryClassifierModel(BaseModel):
         proba_classes = self.model_.predict_proba(X, **kwargs)
         return proba_classes[:, 1]  # Probabilty of class 1
 
+    def available_algorthms(names_only=True):
+        algo_list = algorithms_list.CLASSIFICATION
+        if names_only:
+            return list(algo_list.keys())
+
+        return algo_list
+
+    def add_algorithm(name, constructor):
+        algorithms_list.CLASSIFICATION.update({name: constructor})
+
 
 class RegressionModel(BaseModel):
     def __init__(self, algorithm=None, model_args={}, fit_args={}):
@@ -86,6 +96,16 @@ class RegressionModel(BaseModel):
         model_class = self.get_algorithm_class("regression", algorithm)
         # Construct model class
         self.model_ = model_class(**model_args)
+
+    def available_algorthms(names_only=True):
+        algo_list = algorithms_list.REGRESSION
+        if names_only:
+            return list(algo_list.keys())
+
+        return algo_list
+
+    def add_algorithm(name, constructor):
+        algorithms_list.REGRESSION.update({name: constructor})
 
 
 class UnsupervisedModel(BaseModel):
@@ -112,3 +132,13 @@ class ClusteringModel(UnsupervisedModel):
         model_class = self.get_algorithm_class("clustering", algorithm)
         # Construct model class
         self.model_ = model_class(**model_args)
+
+    def available_algorthms(names_only=True):
+        algo_list = algorithms_list.CLUSTERING
+        if names_only:
+            return list(algo_list.keys())
+
+        return algo_list
+
+    def add_algorithm(name, constructor):
+        algorithms_list.CLUSTERING.update({name: constructor})

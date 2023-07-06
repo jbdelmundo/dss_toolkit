@@ -100,6 +100,7 @@ class MissingValuesDropper(BaseEstimator, TransformerMixin):
 
     Optionally provides flexibility to loosen restrictions to drop additional \
     non-empty columns and rows based on the fraction of NA-values.
+    Dropping of columns is done before computation of row-wise missing values
     """
 
     def __init__(self, col_threshold: float = 1, row_threshold: float = 1, col_exclude: list[str] | None = None):

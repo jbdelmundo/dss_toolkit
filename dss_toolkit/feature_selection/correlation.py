@@ -53,6 +53,9 @@ class CorrelationFilter(BaseEstimator, SelectorMixin):
             mask_values = [c not in self.dropped_columns_ for c in self.orig_columns_]
             return np.array(mask_values)
 
+    def _get_support_mask(self, indices: bool = False):
+        return self.get_support(indices=False)
+
 
 def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
     """
