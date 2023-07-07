@@ -9,7 +9,7 @@ This will copy the contents into your project home
 
 2. Go to the directory and install via pip:
 ```
-cd ds_utils
+cd dss_toolkit
 ```
 ```
 pip3 install . -e
