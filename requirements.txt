@@ -7,7 +7,7 @@ scikit-learn
 sklearn_pandas
 # pyspark==2.4.0
 matplotlib
-seaborn
+
 imblearn
 pyyaml==6.0
 # pyreadr==0.4.4 # pyreadr 0.4.4 depends on pandas>=1.2.0  
@@ -16,8 +16,11 @@ pyarrow
 xgboost
 Boruta
 statsmodels
+seaborn
 openpyxl
 optuna
 Jinja2
 feature-engine
 lightgbm
+feature-engine
+SQLAlchemy==1.4.49 # For compatibility of optuna on mlflow-cml-plugin

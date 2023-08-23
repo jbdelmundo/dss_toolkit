@@ -1,3 +1,4 @@
+import pandas as pd
 import dss_toolkit.modeling.algorithms as algorithms_list
 from sklearn.base import BaseEstimator
 
@@ -10,11 +11,13 @@ class BaseModel(BaseEstimator):
         self.model_ = None
 
     def fit(self, X, y=None, **kwargs):
+        X = _input_check_pandas_to_numpy(X)
+        y = _input_check_pandas_to_numpy(y)
         return self.model_.fit(X, y, **self.fit_args)
 
     def predict_proba(self, X, **kwargs):
-        invert_op = getattr(self, "predict_proba", None)
-        if invert_op is not None and callable(invert_op):
+        proba_func = getattr(self, "predict_proba", None)
+        if proba_func is not None and callable(proba_func):
             return self.model_.predict_proba(X, **kwargs)  # Probablity for all classes
         else:
             raise Exception(f"No method `predict_proba` for instance of {self.model__}")
@@ -142,3 +145,10 @@ class ClusteringModel(UnsupervisedModel):
 
     def add_algorithm(name, constructor):
         algorithms_list.CLUSTERING.update({name: constructor})
+
+
+def _input_check_pandas_to_numpy(X):
+    if isinstance(X, pd.DataFrame):
+        return X.values
+
+    return X
