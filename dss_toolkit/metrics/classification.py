@@ -20,6 +20,7 @@ def generate_report(y_true, y_proba, threshold=0.5):
     y_pred = (y_proba > threshold).astype(int)
 
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    y_df = pd.DataFrame({"y_true": y_true, "y_proba": y_proba})
 
     roc_auc = roc_auc_score(y_true, y_proba)
     report = {
@@ -30,10 +31,13 @@ def generate_report(y_true, y_proba, threshold=0.5):
         "Accuracy": (tp + tn) / (tp + tn + fp + fn),
         "Gini/Accuracy Ratio": (2 * roc_auc) - 1,
         "ROC_AUC": roc_auc,
-        "KS Separation": ks_stat(
+        "KS_decile": ks_stat(
             y_true, y_proba
         ),  # Use custom KS computation (using table)
-        "KS Statistic": ks_2samp(y_true, y_proba).statistic,  # Use scipy
+        "KS_2samp": ks_2samp(
+            y_df[y_df.y_true == 0].y_proba,
+            y_df[y_df.y_true == 1].y_proba,
+        ).statistic,  # Use scipy
         #         'PSI': "",# calculate_psi(y_true,y_pred,buckets=10),
         "Precision": precision_score(y_true, y_pred, zero_division=0),
         "Sensitivity": recall_score(y_true, y_pred, zero_division=0),
