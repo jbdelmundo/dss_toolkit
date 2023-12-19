@@ -3,16 +3,17 @@ import dss_toolkit.modeling.algorithms as algorithms_list
 from sklearn.base import BaseEstimator
 
 
-class BaseModel(BaseEstimator):
+class MLModel(BaseEstimator):
     def __init__(self, algorithm=None, model_args={}, fit_args={}):
         self.algorithm = algorithm
         self.model_args = model_args
         self.fit_args = fit_args
         self.model_ = None
 
-    def fit(self, X, y=None, **kwargs):
-        X = _input_check_pandas_to_numpy(X)
-        y = _input_check_pandas_to_numpy(y)
+    def fit(self, X, y=None, use_numpy=False, **kwargs):
+        if use_numpy:
+            X = _input_check_pandas_to_numpy(X)
+            y = _input_check_pandas_to_numpy(y)
         return self.model_.fit(X, y, **self.fit_args)
 
     def predict_proba(self, X, **kwargs):
@@ -67,7 +68,7 @@ class BaseModel(BaseEstimator):
             return eval_func(y, y_pred, **kwargs)
 
 
-class BinaryClassifierModel(BaseModel):
+class BinaryClassifierModel(MLModel):
     def __init__(self, algorithm=None, model_args={}, fit_args={}):
         super(BinaryClassifierModel, self).__init__(algorithm, model_args, fit_args)
 
@@ -91,7 +92,7 @@ class BinaryClassifierModel(BaseModel):
         algorithms_list.CLASSIFICATION.update({name: constructor})
 
 
-class RegressionModel(BaseModel):
+class RegressionModel(MLModel):
     def __init__(self, algorithm=None, model_args={}, fit_args={}):
         super(RegressionModel, self).__init__(algorithm, model_args, fit_args)
 
@@ -111,7 +112,7 @@ class RegressionModel(BaseModel):
         algorithms_list.REGRESSION.update({name: constructor})
 
 
-class UnsupervisedModel(BaseModel):
+class UnsupervisedModel(MLModel):
     def predict(self, X, **kwargs):
         # check if predict() is available, use fit_predict if Not available
         invert_op = getattr(self.model_, "predict", None)

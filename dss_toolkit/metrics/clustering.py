@@ -2,7 +2,7 @@ from sklearn.metrics import silhouette_score
 from sklearn.metrics import davies_bouldin_score
 
 
-def generate_clustering_report(X, cluster_ids, sample_points=10000):
+def generate_report(X, cluster_ids, sample_points=10000):
     sample_size = None
 
     if X.shape[0] > sample_points:

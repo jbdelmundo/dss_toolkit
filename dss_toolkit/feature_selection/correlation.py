@@ -23,7 +23,7 @@ def find_column_correlations(df):
 
 
 class CorrelationFilter(BaseEstimator, SelectorMixin):
-    def __init__(self, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
+    def __init__(self, anace, maximize_dropped=True):
         self.threshold = threshold
         self.use_abs_corr = use_abs_corr
         self.maximize_dropped = maximize_dropped
@@ -33,7 +33,10 @@ class CorrelationFilter(BaseEstimator, SelectorMixin):
     def fit(self, X, y=None):
         self.orig_columns_ = X.columns
         self.dropped_columns_ = find_correlated_columns_to_drop(
-            X, threshold=self.threshold, use_abs_corr=self.use_abs_corr, maximize_dropped=self.maximize_dropped
+            X,
+            threshold=self.threshold,
+            use_abs_corr=self.use_abs_corr,
+            maximize_dropped=self.maximize_dropped,
         )
         # Remaining columns
         self.columns_ = [c for c in X.columns if c not in self.dropped_columns_]
@@ -47,7 +50,11 @@ class CorrelationFilter(BaseEstimator, SelectorMixin):
 
     def get_support(self, indices: bool = False) -> ndarray:
         if indices:
-            indices_ix = [ix for ix, c in enumerate(self.orig_columns_) if c not in self.dropped_columns_]
+            indices_ix = [
+                ix
+                for ix, c in enumerate(self.orig_columns_)
+                if c not in self.dropped_columns_
+            ]
             return np.array(indices_ix)
         else:
             mask_values = [c not in self.dropped_columns_ for c in self.orig_columns_]
@@ -57,7 +64,9 @@ class CorrelationFilter(BaseEstimator, SelectorMixin):
         return self.get_support(indices=False)
 
 
-def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximize_dropped=True):
+def find_correlated_columns_to_drop(
+    df, threshold=0.5, use_abs_corr=True, maximize_dropped=True
+):
     """
     Returns list of columns to drop based on correlation
     Parameters
@@ -97,7 +106,9 @@ def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximi
                 related_features=("feat_2", list),
             )
             .reset_index()
-            .sort_values("related_feat_count", ascending=maximize_dropped)  # Sort based on number of related features
+            .sort_values(
+                "related_feat_count", ascending=maximize_dropped
+            )  # Sort based on number of related features
         ).reset_index(drop=True)
         #     display(feature_ranking)
         # Check for remaining features to drop
@@ -106,6 +117,8 @@ def find_correlated_columns_to_drop(df, threshold=0.5, use_abs_corr=True, maximi
             #         print("dropping", to_drop)
             dropped_features.append(to_drop)
 
-            dropped_ix = drop_pairs[(drop_pairs.feat_1 == to_drop) | (drop_pairs.feat_2 == to_drop)].index
+            dropped_ix = drop_pairs[
+                (drop_pairs.feat_1 == to_drop) | (drop_pairs.feat_2 == to_drop)
+            ].index
             drop_pairs.drop(dropped_ix, inplace=True)
     return dropped_features

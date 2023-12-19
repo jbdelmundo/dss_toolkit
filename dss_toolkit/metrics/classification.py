@@ -8,13 +8,12 @@ from sklearn.metrics import (
     roc_auc_score,
     precision_score,
     recall_score,
-    ndcg_score,
 )
 
 from scipy.stats import ks_2samp
 
 
-def generate_classification_report(y_true, y_proba, threshold=0.5):
+def generate_report(y_true, y_proba, threshold=0.5):
     valcounts = pd.Series(y_true).value_counts()
     valcounts.sort_index(ascending=True, inplace=True)
 
@@ -31,19 +30,21 @@ def generate_classification_report(y_true, y_proba, threshold=0.5):
         "Accuracy": (tp + tn) / (tp + tn + fp + fn),
         "Gini/Accuracy Ratio": (2 * roc_auc) - 1,
         "ROC_AUC": roc_auc,
-        "KS Test_Binned": ks_stat(y_true, y_proba),  # Use custom KS computation (using table)
-        "KS Test": ks_2samp(y_true, y_proba).statistic,  # Use scipy
+        "KS Separation": ks_stat(
+            y_true, y_proba
+        ),  # Use custom KS computation (using table)
+        "KS Statistic": ks_2samp(y_true, y_proba).statistic,  # Use scipy
         #         'PSI': "",# calculate_psi(y_true,y_pred,buckets=10),
         "Precision": precision_score(y_true, y_pred, zero_division=0),
         "Sensitivity": recall_score(y_true, y_pred, zero_division=0),
         "Specificity": tn / (tn + fp),
         "F1-Score": f1_score(y_true, y_pred),
-        "NDCG": ndcg_score([y_true], [y_proba]),
         "TP": tp,
         "FP": fp,
         "FN": fn,
         "TN": tn,
-        "Balanced Accuracy": ((tp / (tp + fn)) + (tn / (tn + fp))) / 2.0,  # (sensitivity + specificity) / 2
+        "Balanced Accuracy": ((tp / (tp + fn)) + (tn / (tn + fp)))
+        / 2.0,  # (sensitivity + specificity) / 2
     }
 
     return report
@@ -55,7 +56,9 @@ def ks_table(actuals, predictedScores, bins=10):
 
     # sort the actuals and predicred scores and create 10 groups.
     dat = pd.DataFrame({"actuals": actuals, "predictedScores": predictedScores})
-    dat = dat.sort_values(by=["predictedScores"], ascending=[False])  # sort desc by predicted scores
+    dat = dat.sort_values(
+        by=["predictedScores"], ascending=[False]
+    )  # sort desc by predicted scores
     nrows = dat.shape[0]
     rows_in_each_grp = round(dat.shape[0] / bins)
     first_9_grps = np.repeat(range(1, bins), rows_in_each_grp)

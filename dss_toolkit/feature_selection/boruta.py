@@ -23,7 +23,6 @@ def appy_boruta(df, numeric_features, categorical_features, target):
 
 def encode_X(df, numeric_features, categorical_features):
     X_num = df[numeric_features]
-    X_cat_demogs = pd.get_dummies(df[["marital_status", "gender"]], drop_first=True)
-    X_cat_product = pd.get_dummies(df[["first_product_bef_first_auto", "product_bef_first_auto"]], drop_first=False)
-    X = pd.concat([X_num, X_cat_demogs, X_cat_product], axis=1).reset_index().drop(columns="index")
+    X_cat = pd.get_dummies(df[categorical_features], drop_first=True)
+    X = pd.concat([X_num, X_cat], axis=1).reset_index().drop(columns="index")
     return X
